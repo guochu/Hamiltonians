@@ -7,7 +7,7 @@ export AbelianMatrix, tompotensor
 export ExponentialDecayTerm, GenericDecayTerm, PowerlawDecayTerm, exponential_expansion, SchurMPOTensor
 
 # operators, easier interface for building quantum operators incrementally, and used for TEBD. Should it really be here in this package?
-export QTerm, QuantumOperator, simplify, qterms, coeff, positions, op, absorb_one_bodies, todict
+export QTerm, QuantumOperator, simplify, qterms, coeff, positions, op, absorb_one_bodies, todict, apply!
 
 # fermioninterface
 export FermionicSymmetry, SpinfulFermionicSymmetry, ChargeCharge, SpinCharge, SpinlessFermionicSymmetry, Charge
