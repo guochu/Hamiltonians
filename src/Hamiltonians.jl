@@ -9,6 +9,10 @@ export ExponentialDecayTerm, GenericDecayTerm, PowerlawDecayTerm, exponential_ex
 # operators, easier interface for building quantum operators incrementally, and used for TEBD. Should it really be here in this package?
 export QTerm, QuantumOperator, simplify, qterms, coeff, positions, op, absorb_one_bodies, todict
 
+# fermioninterface
+export FermionicSymmetry, SpinfulFermionicSymmetry, ChargeCharge, SpinCharge, SpinlessFermionicSymmetry, Charge
+export FermionicSymmetrySector, ChargeChargeSector, SpinChargeSector, space, ChargeSector
+export twobody, fourbody, creation
 
 using LinearAlgebra: qr, pinv, eigvals
 using SphericalTensors
@@ -38,4 +42,6 @@ include("shortrange/tompo.jl")
 include("utilities/boson_siteops.jl")
 include("utilities/spin_siteops.jl")
 
+# fermioninterface
+include("utilities/fermioninterface/fermioninterface.jl")
 end
