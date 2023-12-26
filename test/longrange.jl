@@ -102,7 +102,7 @@ function initial_state_u1_u1(::Type{T}, L) where {T<:Number}
 end
 
 function do_dmrg(dmrg, alg)
-	dmrg_sweeps = 5
+	dmrg_sweeps = 10
 	# Evals, delta = compute!(dmrg, alg)
 	Evals = Float64[]
 	for i in 1:dmrg_sweeps
