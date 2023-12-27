@@ -43,10 +43,12 @@ function exponential_expansion(fmat::AbstractMatrix)
     return  xs, lambdas, err
 end
 
-exponential_expansion_n(f, L::Int, n::Int) = exponential_expansion(generate_Fmat(f, L, n))
-function exponential_expansion(f, L::Int; atol::Real=1.0e-5)
+# exponential_expansion_n(f, L::Int, n::Int) = exponential_expansion(generate_Fmat(f, L, n))
+exponential_expansion_n(f::Vector{<:Number}, n::Int) = exponential_expansion(generate_Fmat(fvec, n))
+function exponential_expansion(f::Vector{<:Number}; atol::Real=1.0e-5)
+    L = length(f)
     for n in 1:L
-        xs, lambdas, err = exponential_expansion_n(f, L, n)
+        xs, lambdas, err = exponential_expansion_n(f, n)
         if err <= atol
             # println("converged $n iterations, error is $err.")
             return xs, lambdas
@@ -58,6 +60,7 @@ function exponential_expansion(f, L::Int; atol::Real=1.0e-5)
     end
     error("can not find a good approximation")
 end
+exponential_expansion(f, L::Int; atol::Real=1.0e-5) = exponential_expansion([f(k) for k in 1:L], n)
 
 
 abstract type AbstractLongRangeTerm end
