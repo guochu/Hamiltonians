@@ -14,7 +14,7 @@ generate_Fmat(f, L::Int, n::Int) = generate_Fmat([f(k) for k in 1:L], n)
 
 function exponential_expansion(fmat::AbstractMatrix)
     s1, n = size(fmat)
-    (s1 >= n) || error("wrong input, try increase L, or decrease the tolerance")
+    (s1 >= n) || error("wrong input, try increase L, or decrease tol")
     L = s1 - 1 + n
     _u, _v = qr(fmat)
     U = Matrix(_u)
@@ -44,7 +44,7 @@ function exponential_expansion(fmat::AbstractMatrix)
 end
 
 # exponential_expansion_n(f, L::Int, n::Int) = exponential_expansion(generate_Fmat(f, L, n))
-exponential_expansion_n(f::Vector{<:Number}, n::Int) = exponential_expansion(generate_Fmat(fvec, n))
+exponential_expansion_n(f::Vector{<:Number}, n::Int) = exponential_expansion(generate_Fmat(f, n))
 function exponential_expansion(f::Vector{<:Number}; atol::Real=1.0e-5)
     L = length(f)
     for n in 1:L
@@ -54,13 +54,13 @@ function exponential_expansion(f::Vector{<:Number}; atol::Real=1.0e-5)
             return xs, lambdas
         end
         if n >= L-n+1
-            @warn "can not converge to $atol with size $L, try increase L, or decrease the tolerance"
+            @warn "can not converge to $atol with size $L, try increase L, or decrease tol"
             return xs, lambdas
         end
     end
     error("can not find a good approximation")
 end
-exponential_expansion(f, L::Int; atol::Real=1.0e-5) = exponential_expansion([f(k) for k in 1:L], n)
+exponential_expansion(f, L::Int; atol::Real=1.0e-5) = exponential_expansion([f(k) for k in 1:L], atol=atol)
 
 
 abstract type AbstractLongRangeTerm end
@@ -87,7 +87,6 @@ function ExponentialDecayTerm(a::SiteOperator, b::SiteOperator; middle::MPSBondT
 end
 
 TK.scalartype(::Type{ExponentialDecayTerm{M1, M, M2, T}}) where {M1, M, M2, T} = promote_type(scalartype(M1), scalartype(M), scalartype(M2), T)
-TK.scalartype(x::ExponentialDecayTerm) = scalartype(typeof(x))
 TK.spacetype(::Type{ExponentialDecayTerm{M1, M, M2, T}}) where {M1, M, M2, T} = spacetype(M1)
 
 Base.adjoint(x::ExponentialDecayTerm) = ExponentialDecayTerm(_op_adjoint(x.a, x.m, x.b)..., conj(x.α), conj(coeff(x)))
@@ -128,13 +127,13 @@ PowerlawDecayTerm(a::M, b::M; α::Number=1., coeff::Number=1.) where {M<:SiteOpe
 
 Convert a general decaying term into a list of exponential decaying term
 """
-function exponential_expansion(x::GenericDecayTerm{M, T, F}; len::Int, atol::Real=1.0e-5) where {M, T, F}
+function exponential_expansion(x::GenericDecayTerm{M1, M, M2, F, T}; len::Int, atol::Real=1.0e-5) where {M1, M, M2, F, T}
     xs, lambdas = exponential_expansion(x.f, len, atol=atol)
-    r = []
+    r = ExponentialDecayTerm{M1, M, M2, T}[]
     for (c, alpha) in zip(xs, lambdas)
-        push!(r, ExponentialDecayTerm(x.a, x.m, x.b; α=alpha, coeff=c * coeff(x)))
+        push!(r, ExponentialDecayTerm(x.a, x.b; middle=x.m, α=alpha, coeff=c * coeff(x)))
     end
-    return [r...]
+    return r
 end
 
 function _longrange_schurmpo_util(h1, h2s::Vector{<:ExponentialDecayTerm})
