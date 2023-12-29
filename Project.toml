@@ -6,4 +6,5 @@ version = "0.0.1"
 [deps]
 DMRG = "1240110f-4488-488b-9691-4f58b4220f75"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+LsqFit = "2fda8390-95c7-5789-9bda-21331edee243"
 SphericalTensors = "810931ec-fc2f-499d-8094-ffc35d8d9f19"
