@@ -20,8 +20,8 @@ end
 Coefficient(f::Union{Number, Function}) = Coefficient{typeof(f)}(f)
 Coefficient(x::Coefficient) = Coefficient(value(x))
 const AllowedCoefficient = Union{Number, Function, Coefficient}
-const ScalarCoefficient = Coefficient{<:Number}
-const FunctionCoefficient = Coefficient{<:Function}
+const ScalarCoefficient{T} = Coefficient{T} where {T <: Number}
+const FunctionCoefficient{T} = Coefficient{T} where {T <: Function}
 
 # value(x::Number) = x
 value(x::Coefficient) = x.value

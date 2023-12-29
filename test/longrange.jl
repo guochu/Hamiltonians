@@ -33,6 +33,40 @@ function longrange_xxz_ham(L, hz, J, Jzz, α, p)
 	return mpo
 end
 
+function powlaw_xxz(L, J, Jzz, hz, α, p)
+	sp, sm, z = p["+"], p["-"], p["z"]
+	C = [sp, sm]
+	B = [2*J * sp', 2*J * sm']
+	terms = []
+	for (a1, a2) in zip(C, B)
+		push!(terms, ExponentialDecayTerm(a1, a2, α=exp(-1)))
+	end
+	append!(terms, exponential_expansion(PowerlawDecayTerm(z, Jzz*z, α=α), len=L, alg=HankelExpansion(atol=1.0e-8)))
+	return SchurMPOTensor(hz * z, [terms...])
+end
+
+powerlaw_xxz_mpoham(L, J, Jzz, hz, α, p) = MPOHamiltonian([powlaw_xxz(L, J, Jzz, hz, α, p) for i in 1:L])
+
+function powerlaw_xxz_ham(L, J, Jzz, hz, α, p)
+	sp, sm, z = p["+"], p["-"], p["z"]
+	mpo = prodmpo(L, [1], [hz * z])
+	for i in 2:L
+		mpo += prodmpo(L, [i], [hz * z])
+	end
+	compress!(mpo)
+	for i in 1:L
+	    for j in i+1:L
+	    	coeff = exp(-(j-i))
+	    	mpo += prodmpo(L, [i, j], [2*J*coeff*sp, sp'])
+	    	mpo += prodmpo(L, [i, j], [2*J*coeff*sm, sm'])
+	    	coeff = (j-i)^α
+	    	mpo += prodmpo(L, [i, j], [Jzz*coeff*z, z])
+	    	compress!(mpo)
+	    end
+	end
+	return mpo
+end
+
 function longrange_xxz_mpoham(L, hz, J, Jzz, α, p)
 	# the last term of J and Jzz not used
 	mpo = MPOHamiltonian([longrange_xxz(J, Jzz, hz, α, p) for i in 1:L])
@@ -112,6 +146,19 @@ function do_dmrg(dmrg, alg)
 end
 
 
+@testset "Exponential expansion    " begin
+	L = 100
+	atol = 1.0e-5
+	for alpha in (-2, -2.5, -3)
+		xdata = [convert(Float64, i) for i in 1:L]
+		ydata = [1.3 * x^alpha for x in xdata]
+		xs1, lambdas1 = exponential_expansion(ydata, HankelExpansion(atol=atol))
+		@test expansion_error(ydata, xs1, lambdas1) < atol
+		xs2, lambdas2 = exponential_expansion(ydata, LsqExpansion(atol=atol))
+		@test expansion_error(ydata, xs2, lambdas2) < atol
+	end
+end
+
 @testset "MPOHamiltonian: long-range XXZ        " begin
 	p = spin_site_ops_u1()
 	for L in (2, 3, 4)
@@ -132,6 +179,23 @@ end
 		@test expectation(h1, state) ≈ expectation(h2, state) atol = 1.0e-12
 		@test distance(MPO(h1), h2) ≈ 0. atol = 1.0e-5		
 	end
+end
+
+@testset "MPOHamiltonian: power-law XXZ      " begin
+	p = spin_site_ops_u1()
+	L = 20
+	α = -2.5
+	hz = 0.8
+	J = 1
+	Jzz = 1.2
+	h1 = powerlaw_xxz_mpoham(L, hz, J, Jzz, α, p)
+	h2 = powerlaw_xxz_ham(L, hz, J, Jzz, α, p)
+
+	right = iseven(L) ? Rep[U₁](0=>1) : Rep[U₁](1=>1)
+	state = randommps(Float64, physical_spaces(h1), right=right, D=4)
+	@test expectation(h1, state) ≈ expectation(h2, state) atol = 1.0e-6
+	mpo1 = MPO(h1)
+	@test distance(mpo1, h2) / norm(mpo1) < 1.0e-6
 end
 
 @testset "MPOHamiltonian: long-range fermions    " begin

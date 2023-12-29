@@ -4,7 +4,8 @@ module Hamiltonians
 export Coefficient, value, isconstant
 export AbelianMatrix, tompotensor
 
-export ExponentialDecayTerm, GenericDecayTerm, PowerlawDecayTerm, exponential_expansion, SchurMPOTensor
+export ExponentialExpansionAlgorithm, HankelExpansion, LsqExpansion, exponential_expansion, expansion_error
+export ExponentialDecayTerm, GenericDecayTerm, PowerlawDecayTerm, SchurMPOTensor
 
 # operators, easier interface for building quantum operators incrementally, and used for TEBD. Should it really be here in this package?
 export QTerm, QuantumOperator, simplify, qterms, coeff, positions, op, absorb_one_bodies, todict, apply!
@@ -14,6 +15,7 @@ export FermionicSymmetry, SpinfulFermionicSymmetry, ChargeCharge, SpinCharge, Sp
 export FermionicSymmetrySector, ChargeChargeSector, SpinChargeSector, space, ChargeSector
 export twobody, fourbody, creation
 
+using LsqFit
 using LinearAlgebra: qr, pinv, eigvals
 using SphericalTensors
 const TK = SphericalTensors
