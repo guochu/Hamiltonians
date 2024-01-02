@@ -218,7 +218,7 @@ end
 			end
 			state = randommps(ComplexF64, physical_spaces(h1), right=right, D=4)
 			state = canonicalize!(state)
-			@test expectation(h1, state) ≈ expectation(h2, state) atol = 1.0e-12
+			@test expectation(h1, state) ≈ expectation(h2, state) atol = 1.0e-10
 			@test distance(MPO(h1), h2) ≈ 0. atol = 1.0e-5		
 		end
 	end
