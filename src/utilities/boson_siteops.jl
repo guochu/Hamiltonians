@@ -1,7 +1,7 @@
 
 
 function boson_annihilation(;d::Int)
-	(d <= 1) && error("d must be larger than 1.")
+	(d <= 1) && error("d must be larger than 1")
 	a = zeros(Float64, d, d)
 	for i = 1:(d - 1)
 		a[i, i+1] = sqrt(i)

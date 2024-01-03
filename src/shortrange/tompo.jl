@@ -24,7 +24,7 @@ function DMRG.MPO(h::QuantumOperator, alg::MPOCompression)
 			compress_threshold += 5
 		end
 	end
-	(!(@isdefined mpo)) && throw(ArgumentError("Hamiltonian is empty after compression."))
+	(!(@isdefined mpo)) && throw(ArgumentError("Hamiltonian is empty after compression"))
 	mpo = compress!(mpo, alg)
 	return mpo
 end
