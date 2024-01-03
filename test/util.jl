@@ -148,3 +148,5 @@ function spinal_fermion_site_ops_u1_u1()
 	return Dict("+"=>adag, "-"=>a, "++"=>adagadag, "+-"=>adaga, "n↑n↓"=>onsite_interact, 
 		"JW"=>JW, "n"=>occupy)
 end
+
+max_error(a::Vector, b::Vector) = maximum(abs.(a - b))
