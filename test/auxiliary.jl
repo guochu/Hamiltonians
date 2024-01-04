@@ -41,7 +41,7 @@ end
 
 
 @testset "Abelian matrix" begin
-	p = Hamiltonians.boson_matrices(d=5)
+	p = boson_matrices(d=5)
 	adag, a, n = p["+"], p["-"], p["n"]
 	adag′ = convert(AbelianMatrix, adag)
 	a′ = convert(AbelianMatrix, a)

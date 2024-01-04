@@ -4,8 +4,9 @@ push!(LOAD_PATH, dirname(dirname(Base.@__DIR__)) * "/InfiniteDMRG/src")
 push!(LOAD_PATH, dirname(Base.@__DIR__) * "/src")
 
 using Test, Random
-using SphericalTensors, DMRG, InfiniteDMRG
-using Hamiltonians
+using SphericalTensors
+using GeneralHamiltonians: boson_matrices
+using DMRG, InfiniteDMRG, Hamiltonians
 
 Random.seed!(1342)
 
